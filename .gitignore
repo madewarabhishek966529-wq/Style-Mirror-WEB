@@ -1,0 +1,36 @@
+# env & secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.jks
+*.keystore
+service-account*.json
+google-services.json.local
+
+# python
+__pycache__/
+*.db
+stylemirror.db
+.venv/
+venv/
+ENV/
+env/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.ruff_cache/
+
+# node / frontend
+node_modules/
+.next/
+out/
+dist/
+
+# app data & storage
+storage/
+tmp/
+*.log
+.DS_Store
+Thumbs.db

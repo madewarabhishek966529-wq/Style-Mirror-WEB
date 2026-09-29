@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StyleMirror — AI Haircut & Beard Try-On Studio</title>
+  <meta name="description" content="Preview realistic hairstyles and beard cuts on your own face before visiting the barber. Identity-preserving AI try-on with 50 curated styles.">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+  <!-- Header / Navigation -->
+  <header class="site-header">
+    <div class="header-container">
+      <a href="/" class="brand-logo" id="nav-brand-logo">
+        <div class="brand-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+          </svg>
+        </div>
+        <span>Style<span class="text-gradient">Mirror</span></span>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#how-it-works">How It Works</a></li>
+          <li><a href="#catalog">Style Catalog</a></li>
+          <li><a href="#privacy">Privacy</a></li>
+          <li><a href="/try.html" class="btn btn-primary btn-sm" id="nav-btn-try">Try Studio</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-wrapper">
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-content">
+        <div class="hero-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+          </svg>
+          Identity-Preserving AI Barber Studio
+        </div>
+        <h1>Preview Your Next Cut <span class="text-gradient">Before The Barber</span>.</h1>
+        <p class="hero-subtitle">
+          Upload one clear selfie. Explore 25 modern hairstyles and 25 beard styles alone or combined. Look exactly like yourself—no face-swapping, no guesswork.
+        </p>
+
+        <div class="hero-actions">
+          <a href="/try.html" class="btn btn-primary btn-lg" id="hero-cta-btn">
+            <span>Start Free Try-On</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+          <a href="#catalog" class="btn btn-secondary btn-lg">Browse 50 Styles</a>
+        </div>
+
+        <div style="display: flex; gap: 1.5rem; margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">
+          <span>✓ 100% Private (24h Auto-Delete)</span>
+          <span>✓ No App or Sign-Up Needed</span>
+        </div>
+      </div>
+
+      <!-- Hero Interactive Teaser Card -->
+      <div class="glass-panel" style="padding: 1.5rem; text-align: center;">
+        <div style="position: relative; border-radius: var(--radius-lg); overflow: hidden; background: #090d16; aspect-ratio: 1; max-width: 420px; margin: 0 auto; box-shadow: var(--shadow-glow);">
+          <img src="/assets/styles/hair/H12.svg" alt="Quiff Hairstyle Demo" style="width: 100%; height: 100%; object-fit: cover;" />
+          <div style="position: absolute; bottom: 16px; left: 16px; right: 16px; padding: 0.8rem 1rem; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(10px); border-radius: var(--radius-md); border: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-weight: 700; font-size: 0.95rem; color: #fff;">Modern Quiff + Short Boxed Beard</div>
+              <div style="font-size: 0.75rem; color: var(--accent-primary);">AI Generated Preview • 94% Identity Match</div>
+            </div>
+            <a href="/try.html" class="btn btn-primary btn-sm">Try Look</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="how-it-works" style="padding: 4rem 0;">
+      <div style="text-align: center; max-width: 640px; margin: 0 auto 3rem;">
+        <h2 style="margin-bottom: 0.75rem;">How <span class="text-gradient">StyleMirror</span> Works</h2>
+        <p>Three effortless steps to find the haircut and facial hair tailored to your face structure.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="glass-panel" style="padding: 2rem;">
+          <div class="brand-icon" style="margin-bottom: 1.25rem;">1</div>
+          <h3 style="margin-bottom: 0.75rem;">Upload One Selfie</h3>
+          <p>Take a quick photo or upload an existing front portrait. Our biometric scanner checks lighting, angle, and clarity.</p>
+        </div>
+
+        <div class="glass-panel" style="padding: 2rem;">
+          <div class="brand-icon" style="margin-bottom: 1.25rem;">2</div>
+          <h3 style="margin-bottom: 0.75rem;">Pick Hair & Beard</h3>
+          <p>Select from 25 classic & trending haircuts and 25 precision beards. Mix and match for 625 combinations.</p>
+        </div>
+
+        <div class="glass-panel" style="padding: 2rem;">
+          <div class="brand-icon" style="margin-bottom: 1.25rem;">3</div>
+          <h3 style="margin-bottom: 0.75rem;">Compare & Download</h3>
+          <p>Slide between your original selfie and styled render. Show the exact cut to your barber or save for later.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Style Catalog Preview Section -->
+    <section id="catalog" style="padding: 4rem 0;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <h2>Explore The <span class="text-gradient">Catalog</span></h2>
+          <p>Curated barber staples and contemporary cuts ready for try-on.</p>
+        </div>
+        <a href="/try.html" class="btn btn-outline">Explore All 50 Styles →</a>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;">
+        <div class="style-card">
+          <div class="style-thumb-wrap">
+            <img src="/assets/styles/hair/H01.svg" alt="Crew Cut" />
+          </div>
+          <div class="style-card-body">
+            <span class="style-card-name">Crew Cut</span>
+            <span class="style-card-desc">Tapered sides with slightly longer flat top</span>
+          </div>
+        </div>
+
+        <div class="style-card">
+          <div class="style-thumb-wrap">
+            <img src="/assets/styles/hair/H03.svg" alt="French Crop" />
+          </div>
+          <div class="style-card-body">
+            <span class="style-card-name">French Crop</span>
+            <span class="style-card-desc">Short textured top with clean forward fringe</span>
+          </div>
+        </div>
+
+        <div class="style-card">
+          <div class="style-thumb-wrap">
+            <img src="/assets/styles/beard/B03.svg" alt="Short Boxed Beard" />
+          </div>
+          <div class="style-card-body">
+            <span class="style-card-name">Short Boxed Beard</span>
+            <span class="style-card-desc">Sharply lined, neat executive beard</span>
+          </div>
+        </div>
+
+        <div class="style-card">
+          <div class="style-thumb-wrap">
+            <img src="/assets/styles/beard/B08.svg" alt="Van Dyke" />
+          </div>
+          <div class="style-card-body">
+            <span class="style-card-name">Van Dyke</span>
+            <span class="style-card-desc">Pointed chin beard with styled disconnected mustache</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Privacy Banner Section -->
+    <section id="privacy" class="glass-panel" style="padding: 3rem; margin: 4rem 0; border-color: rgba(16, 185, 129, 0.3);">
+      <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+        <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(16, 185, 129, 0.15); color: var(--success); display: flex; align-items: center; justify-content: center; font-size: 1.8rem;">
+          🛡️
+        </div>
+        <div style="flex: 1; min-width: 280px;">
+          <h3 style="margin-bottom: 0.5rem; color: #fff;">Your Biometric Privacy Is Guaranteed</h3>
+          <p style="font-size: 0.95rem;">
+            Uploaded selfies are stored temporarily solely to generate previews. Photos and styles are permanently purged within 24 hours. A manual <strong>"Delete My Photo Now"</strong> button is accessible at all times.
+          </p>
+        </div>
+        <a href="/privacy.html" class="btn btn-secondary">Read Privacy Policy</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <span style="font-weight: 700; color: #fff;">StyleMirror</span>
+        <span style="color: var(--text-muted);">© 2026. All rights reserved.</span>
+      </div>
+
+      <div class="footer-links">
+        <a href="/try.html">Try-On Studio</a>
+        <a href="/privacy.html">Privacy Policy</a>
+        <a href="/terms.html">Terms of Service</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

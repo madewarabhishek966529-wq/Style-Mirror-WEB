@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Try-On Studio — StyleMirror</title>
+  <meta name="description" content="AI Haircut & Beard interactive styling studio. Select from 25 hairstyles and 25 beards.">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+  <!-- Header / Navigation -->
+  <header class="site-header">
+    <div class="header-container">
+      <a href="/" class="brand-logo" id="try-brand-logo">
+        <div class="brand-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+          </svg>
+        </div>
+        <span>Style<span class="text-gradient">Mirror</span> Studio</span>
+      </a>
+
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <span style="font-size: 0.8rem; color: var(--text-muted); display: none; sm-display: inline;" id="auto-delete-indicator">🔒 Auto-deleted in 24h</span>
+        <button id="btn-delete-photo" class="btn btn-danger btn-sm" title="Delete current photo and all outputs immediately">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          <span>Delete My Photo</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Studio Stepper -->
+  <div style="max-width: 1280px; margin: 1.5rem auto 0; padding: 0 1.5rem;">
+    <div class="studio-stepper">
+      <div class="step-item active" id="stepper-1">
+        <div class="step-bubble">1</div>
+        <span class="step-label">Upload Photo</span>
+      </div>
+      <div class="step-divider"></div>
+      <div class="step-item" id="stepper-2">
+        <div class="step-bubble">2</div>
+        <span class="step-label">Select Styles</span>
+      </div>
+      <div class="step-divider"></div>
+      <div class="step-item" id="stepper-3">
+        <div class="step-bubble">3</div>
+        <span class="step-label">Results</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Wrapper -->
+  <main class="main-wrapper" style="padding-top: 1rem;">
+    <!-- ==========================================
+         STEP 1: Upload Photo View
+         ========================================== -->
+    <section id="step-1-view" class="studio-step-view active">
+      <div class="glass-panel upload-card">
+        <h2 style="margin-bottom: 0.5rem;">Upload Your Portrait</h2>
+        <p style="margin-bottom: 2rem;">Ensure good frontal lighting for the most accurate hair and beard preview.</p>
+
+        <!-- Dropzone -->
+        <div id="dropzone" class="dropzone">
+          <div class="dropzone-icon">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+          </div>
+          <div style="font-weight: 700; font-size: 1.1rem; color: #fff;">Click to Browse or Drag & Drop</div>
+          <div style="font-size: 0.85rem; color: var(--text-muted);">Supports JPG, PNG or WEBP (up to 8 MB)</div>
+          <div style="margin-top: 0.5rem; display: flex; gap: 0.75rem;">
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-browse-file" onclick="document.getElementById('file-input').click();">Browse Device</button>
+            <button type="button" class="btn btn-outline btn-sm" id="btn-start-webcam">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19 4h-3.5L14 2H10L8.5 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path>
+              </svg>
+              Use Camera
+            </button>
+          </div>
+        </div>
+        <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp" style="display: none;" />
+
+        <!-- Webcam Container -->
+        <div id="webcam-container" class="webcam-container">
+          <div class="webcam-video-wrap">
+            <video id="webcam-video" autoplay playsinline muted></video>
+          </div>
+          <div style="display: flex; gap: 1rem;">
+            <button type="button" class="btn btn-primary" id="btn-capture-photo">Take Photo</button>
+            <button type="button" class="btn btn-secondary" id="btn-cancel-webcam">Cancel</button>
+          </div>
+        </div>
+
+        <!-- Validated Preview Container -->
+        <div id="upload-preview-wrap" class="preview-container">
+          <div class="preview-img-wrap">
+            <img id="preview-img" src="" alt="Uploaded Face Preview" />
+          </div>
+          <div style="display: flex; gap: 1rem;">
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-retake">Retake / Change</button>
+            <button type="button" class="btn btn-primary btn-sm" id="btn-proceed-styles">Proceed to Styles →</button>
+          </div>
+        </div>
+
+        <!-- Photo Tips -->
+        <div class="tips-grid">
+          <div class="tip-pill">
+            <span>👤</span>
+            <span>Single face only</span>
+          </div>
+          <div class="tip-pill">
+            <span>💡</span>
+            <span>Good daylight</span>
+          </div>
+          <div class="tip-pill">
+            <span>👓</span>
+            <span>No heavy caps / hats</span>
+          </div>
+          <div class="tip-pill">
+            <span>📐</span>
+            <span>Face the camera directly</span>
+          </div>
+        </div>
+
+        <!-- Consent Box (Required) -->
+        <div class="consent-panel">
+          <label class="consent-row">
+            <input type="checkbox" id="consent-own" class="consent-checkbox" checked />
+            <span>This is my own photo, or I have explicit legal permission to style this face.</span>
+          </label>
+          <label class="consent-row">
+            <input type="checkbox" id="consent-agree" class="consent-checkbox" checked />
+            <span>I agree to temporary photo processing. Photos are never used for training and auto-deleted within 24h.</span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         STEP 2: Style Selection View
+         ========================================== -->
+    <section id="step-2-view" class="studio-step-view">
+      <div class="catalog-toolbar">
+        <div class="catalog-tabs">
+          <button type="button" class="tab-btn active" id="tab-hair">Hairstyles (25)</button>
+          <button type="button" class="tab-btn" id="tab-beard">Beard Styles (25)</button>
+        </div>
+
+        <div class="catalog-search">
+          <svg class="catalog-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="catalog-search" placeholder="Search styles..." />
+        </div>
+      </div>
+
+      <!-- Styles Grid -->
+      <div id="style-grid" class="style-grid">
+        <!-- Injected via styleGrid.js -->
+      </div>
+    </section>
+
+    <!-- ==========================================
+         STEP 3: Result View
+         ========================================== -->
+    <section id="step-3-view" class="studio-step-view">
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <h2>Your Styled <span class="text-gradient">Look</span></h2>
+        <p>Drag the slider left and right to inspect the cut before and after.</p>
+        <div id="identity-score-badge" class="hero-badge" style="margin-top: 0.75rem;">
+          95% Identity Preserved
+        </div>
+      </div>
+
+      <!-- Before / After Comparison Slider -->
+      <div class="comparison-container">
+        <div class="comparison-slider" id="comparison-slider">
+          <!-- Before image (underneath) -->
+          <img class="slider-img slider-img-before" src="" alt="Original Selfie" />
+          <!-- After image (clipped on top) -->
+          <img class="slider-img slider-img-after" id="slider-img-after" src="" alt="Styled Result" />
+          <!-- Handle Line -->
+          <div class="slider-handle-line" id="slider-handle-line"></div>
+          <!-- Handle Button -->
+          <div class="slider-handle-button" id="slider-handle-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M8 7l-5 5 5 5M16 7l5 5-5 5"/>
+            </svg>
+          </div>
+          <!-- Transparent Range Input for Touch / Mouse Dragging -->
+          <input type="range" min="0" max="100" value="50" class="slider-range-input" id="slider-range" />
+        </div>
+        <div class="slider-labels">
+          <span>← Original Photo</span>
+          <span>AI Styled Result →</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin-top: 2rem;">
+        <button id="btn-download" class="btn btn-primary btn-lg">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span>Download High-Res</span>
+        </button>
+        <button id="btn-try-another" class="btn btn-secondary btn-lg">Try Another Style</button>
+        <button id="btn-change-hair" class="btn btn-outline btn-lg">Change Hair</button>
+        <button id="btn-change-beard" class="btn btn-outline btn-lg">Change Beard</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Sticky Bottom Action Bar (Appears in Step 2) -->
+  <aside class="sticky-action-bar hidden" id="sticky-action-bar">
+    <div class="chosen-summary">
+      <div class="chosen-pill">
+        <span>Hair:</span>
+        <strong id="chosen-hair-name">None</strong>
+      </div>
+      <div class="chosen-pill">
+        <span>Beard:</span>
+        <strong id="chosen-beard-name">None</strong>
+      </div>
+    </div>
+    <button id="btn-generate" class="btn btn-primary" disabled>
+      <span>Generate Look</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+    </button>
+  </aside>
+
+  <!-- Generation Progress Modal Overlay -->
+  <div class="progress-overlay" id="progress-overlay">
+    <div class="progress-box">
+      <div class="progress-spinner"></div>
+      <div>
+        <div class="progress-stage-text" id="progress-stage-text">Analyzing face geometry...</div>
+        <div class="progress-subtext" style="margin-top: 0.5rem;">Applying photorealistic styling while keeping identity intact</div>
+      </div>
+      <div style="font-size: 0.8rem; color: var(--text-muted);">Usually takes 5–15 seconds</div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script type="module" src="/js/main.js"></script>
+</body>
+</html>

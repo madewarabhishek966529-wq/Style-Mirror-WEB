@@ -630,3 +630,70 @@
   border-color: rgba(16, 185, 129, 0.4);
   color: #6ee7b7;
 }
+
+/* Quick Demo Models Picker */
+.demo-models-section {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px dashed rgba(148, 163, 184, 0.2);
+  text-align: center;
+}
+
+.demo-models-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent-primary);
+  margin-bottom: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.demo-models-grid {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.demo-model-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border-subtle);
+  background: rgba(15, 23, 42, 0.6);
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.demo-model-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent-primary);
+  background: rgba(56, 189, 248, 0.08);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+}
+
+.demo-model-card img {
+  width: 68px;
+  height: 68px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  border: 2px solid transparent;
+  transition: border-color var(--transition-fast);
+}
+
+.demo-model-card:hover img {
+  border-color: var(--accent-primary);
+}
+
+.demo-model-card span {
+  font-size: 0.8rem;
+  font-weight: 600;
+}

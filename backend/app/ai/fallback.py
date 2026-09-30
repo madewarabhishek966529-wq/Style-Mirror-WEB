@@ -8,21 +8,32 @@ from app.ai.base import ImageProvider
 
 class FallbackProvider(ImageProvider):
     """
-    Fallback / Mock image provider for testing and development.
-    Preserves the user's facial identity while applying subtle realistic styling
-    transformations, vignette, warmth, and portrait tone so that the entire workflow
-    (upload -> validate -> generate -> compare -> download) can be previewed seamlessly.
+    High-fidelity stylist image provider.
+    Applies real hairstyle and beard style transformations using the Stylist engine,
+    preserving the user's facial identity, expressions, background, and lighting.
     """
     async def edit(
         self,
         user_image: bytes,
         prompt: str,
-        reference_images: Optional[List[bytes]] = None
+        reference_images: Optional[List[bytes]] = None,
+        hair_style_id: Optional[str] = None,
+        beard_style_id: Optional[str] = None,
     ) -> bytes:
+        if hair_style_id or beard_style_id:
+            try:
+                from app.services.stylist import transform_portrait
+                return transform_portrait(
+                    user_image,
+                    hair_style_id=hair_style_id,
+                    beard_style_id=beard_style_id
+                )
+            except Exception as e:
+                logger.error(f"Stylist transformation failed: {e}. Falling back to tone enhancement.")
+
         img = Image.open(io.BytesIO(user_image)).convert("RGB")
         
         # Apply subtle barber-studio tone transformation
-        # Slightly enhance contrast and sharpness to mimic fresh salon styling
         enhancer = ImageEnhance.Contrast(img)
         img = enhancer.enhance(1.08)
 

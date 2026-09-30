@@ -30,6 +30,8 @@ dist/
 
 # app data & storage
 storage/
+backend/storage/
+scratch/
 tmp/
 *.log
 .DS_Store

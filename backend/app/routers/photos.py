@@ -43,10 +43,24 @@ async def upload_photo(
     # Validate face quality & pose
     validation_result = validate_photo_bytes(content)
     if not validation_result["ok"]:
+        issues = validation_result.get("issues", [])
+        issue_descriptions = {
+            "NO_FACE": "No face detected in the photo. Please look straight into the camera in good lighting.",
+            "MULTIPLE_FACES": "Multiple faces detected. Please upload a portrait with only one person.",
+            "FACE_TOO_SMALL": "Face appears too small or distant. Please move closer to the camera.",
+            "IMAGE_TOO_SMALL": "Photo resolution is too low. Minimum resolution is 512x512 pixels.",
+            "TOO_BLURRY": "Photo is too blurry. Please upload a sharper, in-focus image.",
+            "TOO_DARK": "Photo is too dark. Please take or upload a photo with front lighting.",
+            "TOO_BRIGHT": "Photo is overexposed. Please choose an evenly lit photo.",
+            "FACE_NOT_FRONTAL": "Please look straight at the camera (extreme tilt or angles cannot be styled).",
+            "INVALID_IMAGE_FILE": "Unable to process image file. Please upload a valid JPG, PNG, or WEBP photo."
+        }
+        first_issue = issues[0] if issues else "INVALID_IMAGE_FILE"
+        msg = issue_descriptions.get(first_issue, "Photo did not meet face validation requirements.")
         return PhotoUploadResponse(
             ok=False,
-            issues=validation_result["issues"],
-            message="Photo did not meet face validation requirements."
+            issues=issues,
+            message=msg
         )
 
     photo_id = str(uuid.uuid4())

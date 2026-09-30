@@ -31,9 +31,12 @@ const ERROR_MESSAGES = {
   NO_FACE: "No face detected. Please face the camera directly in good lighting.",
   MULTIPLE_FACES: "Multiple faces detected. Please upload a portrait with only one person.",
   FACE_TOO_SMALL: "Face appears too small or distant. Please move closer to the camera.",
+  IMAGE_TOO_SMALL: "Photo resolution is too low. Please upload a photo of at least 512×512 pixels.",
   TOO_BLURRY: "Image is too blurry. Hold the camera steady in a well-lit space.",
   TOO_DARK: "Image is too dark. Please take or upload a photo with front lighting.",
+  TOO_BRIGHT: "Image is too bright or overexposed. Please choose an evenly lit photo.",
   FACE_NOT_FRONTAL: "Please look straight at the camera (tilt or side angles cannot be accurately styled).",
+  INVALID_IMAGE_FILE: "Could not process this image file. Please upload a clear JPG, PNG, or WEBP portrait.",
   FILE_TOO_LARGE: "File size exceeds the 8MB limit. Please choose a smaller image.",
   UNSUPPORTED_TYPE: "Unsupported file format. Please upload a standard JPG, PNG, or WEBP photo.",
   RATE_LIMITED: "Hourly limit reached. Please wait a few minutes before trying again.",
@@ -190,6 +193,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (previewImg) previewImg.src = previewUrl;
       if (dropzoneEl) dropzoneEl.style.display = "none";
+      const demoModelsWrap = document.getElementById("demo-models-wrap");
+      if (demoModelsWrap) demoModelsWrap.style.display = "none";
       if (uploadPreviewWrap) uploadPreviewWrap.style.display = "flex";
 
       showToast("Face validated successfully! Choose your styles.", "success");
@@ -200,6 +205,27 @@ document.addEventListener("DOMContentLoaded", () => {
       showToast(msg, "error", 5000);
     }
   }
+
+  // Quick Demo Models Click Handler
+  const demoButtons = document.querySelectorAll(".demo-model-card");
+  demoButtons.forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const src = btn.getAttribute("data-src");
+      if (!src) return;
+      showToast("Loading demo portrait...", "normal", 2000);
+      try {
+        const response = await fetch(src);
+        if (!response.ok) throw new Error("Could not load demo image");
+        const blob = await response.blob();
+        const filename = src.split("/").pop() || "demo.jpg";
+        const file = new File([blob], filename, { type: "image/jpeg" });
+        await processUploadedFile(file);
+      } catch (err) {
+        console.error("Demo load error:", err);
+        showToast("Failed to load demo portrait: " + err.message, "error");
+      }
+    });
+  });
 
   // Webcam button handlers
   if (btnStartWebcam) {
@@ -231,6 +257,8 @@ document.addEventListener("DOMContentLoaded", () => {
   if (btnRetake) {
     btnRetake.addEventListener("click", () => {
       if (dropzoneEl) dropzoneEl.style.display = "flex";
+      const demoModelsWrap = document.getElementById("demo-models-wrap");
+      if (demoModelsWrap) demoModelsWrap.style.display = "block";
       if (uploadPreviewWrap) uploadPreviewWrap.style.display = "none";
       if (fileInputEl) fileInputEl.value = "";
     });

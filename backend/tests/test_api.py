@@ -71,3 +71,50 @@ def test_nonexistent_photo_generation_fails(client):
     assert res.status_code == 404
     body = res.json()
     assert body["error"]["code"] == "PHOTO_NOT_FOUND"
+
+def test_photo_upload_small_resolution_fails(client):
+    img = Image.new("RGB", (256, 256), color=(200, 200, 200))
+    buf = io.BytesIO()
+    img.save(buf, format="JPEG")
+    res = client.post("/v1/photos", files={"file": ("small.jpg", buf.getvalue(), "image/jpeg")})
+    assert res.status_code == 200
+    data = res.json()
+    assert data["ok"] is False
+    assert "IMAGE_TOO_SMALL" in data["issues"]
+
+def test_photo_upload_no_face_fails(client):
+    img = Image.new("RGB", (600, 600), color=(180, 180, 180))
+    buf = io.BytesIO()
+    img.save(buf, format="JPEG")
+    res = client.post("/v1/photos", files={"file": ("noface.jpg", buf.getvalue(), "image/jpeg")})
+    assert res.status_code == 200
+    data = res.json()
+    assert data["ok"] is False
+    assert "NO_FACE" in data["issues"]
+
+def test_generation_with_valid_photo_succeeds(client):
+    from app.models import Photo
+    from app.db import SessionLocal
+    from datetime import datetime, timezone, timedelta
+    db = SessionLocal()
+    pid = "test-gen-photo-valid"
+    photo = Photo(
+        id=pid,
+        session_id="test-session",
+        storage_path="photos/test/original.jpg",
+        sha256="dummyhash",
+        face_meta={},
+        created_at=datetime.now(timezone.utc),
+        expires_at=datetime.now(timezone.utc) + timedelta(hours=24)
+    )
+    db.merge(photo)
+    db.commit()
+    db.close()
+
+    res = client.post("/v1/generations", json={"photo_id": pid, "hair_style_id": "H01"})
+    assert res.status_code == 200
+    data = res.json()
+    assert "job_id" in data
+    assert data["status"] in ("queued", "running", "done")
+
+

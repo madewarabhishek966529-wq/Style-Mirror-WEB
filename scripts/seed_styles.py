@@ -77,7 +77,7 @@ def seed(db_path: str = None):
         db = SessionLocal()
         count = 0
         for idx, (code, name, hint) in enumerate(HAIRSTYLES, start=1):
-            thumb = f"/assets/styles/hair/{code}.svg"
+            thumb = f"/assets/styles/hair/{code}.jpg"
             existing = db.query(Style).filter(Style.id == code).first()
             if existing:
                 existing.name = name
@@ -98,7 +98,7 @@ def seed(db_path: str = None):
             count += 1
 
         for idx, (code, name, hint) in enumerate(BEARDS, start=1):
-            thumb = f"/assets/styles/beard/{code}.svg"
+            thumb = f"/assets/styles/beard/{code}.jpg"
             existing = db.query(Style).filter(Style.id == code).first()
             if existing:
                 existing.name = name
@@ -143,7 +143,7 @@ def seed(db_path: str = None):
             )
         """)
         for idx, (code, name, hint) in enumerate(HAIRSTYLES, start=1):
-            thumb = f"/assets/styles/hair/{code}.svg"
+            thumb = f"/assets/styles/hair/{code}.jpg"
             cur.execute("""
                 INSERT INTO styles (id, type, name, prompt_hint, thumb_url, sort_order, is_active)
                 VALUES (?, 'hair', ?, ?, ?, ?, 1)
@@ -155,7 +155,7 @@ def seed(db_path: str = None):
             """, (code, name, hint, thumb, idx))
 
         for idx, (code, name, hint) in enumerate(BEARDS, start=1):
-            thumb = f"/assets/styles/beard/{code}.svg"
+            thumb = f"/assets/styles/beard/{code}.jpg"
             cur.execute("""
                 INSERT INTO styles (id, type, name, prompt_hint, thumb_url, sort_order, is_active)
                 VALUES (?, 'beard', ?, ?, ?, ?, 1)

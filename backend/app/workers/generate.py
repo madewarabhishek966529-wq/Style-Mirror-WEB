@@ -17,9 +17,17 @@ logger = logging.getLogger(__name__)
 def get_provider(provider_name: str):
     p = (provider_name or "").lower().strip()
     if p == "gemini":
-        return GeminiProvider()
+        try:
+            return GeminiProvider()
+        except Exception as e:
+            logger.warning(f"Failed to initialize GeminiProvider: {e}. Falling back to Stylist provider.")
+            return FallbackProvider()
     elif p == "replicate":
-        return ReplicateProvider()
+        try:
+            return ReplicateProvider()
+        except Exception as e:
+            logger.warning(f"Failed to initialize ReplicateProvider: {e}. Falling back to Stylist provider.")
+            return FallbackProvider()
     return FallbackProvider()
 
 def add_watermark(image_bytes: bytes, text: str = "StyleMirror AI Preview") -> bytes:
@@ -93,19 +101,35 @@ async def process_generation_job(job_id: str):
         provider = get_provider(settings.AI_PROVIDER)
         provider_name = settings.AI_PROVIDER
         output_bytes = None
+        async def call_provider(prov):
+            try:
+                return await prov.edit(
+                    proc_bytes,
+                    prompt,
+                    hair_style_id=job.hair_style_id,
+                    beard_style_id=job.beard_style_id
+                )
+            except TypeError:
+                return await prov.edit(proc_bytes, prompt)
+
         try:
-            output_bytes = await provider.edit(proc_bytes, prompt)
+            output_bytes = await call_provider(provider)
         except Exception as e:
             logger.warning(f"Primary provider {settings.AI_PROVIDER} failed: {e}. Trying fallback.")
             if settings.AI_FALLBACK_PROVIDER and settings.AI_FALLBACK_PROVIDER != settings.AI_PROVIDER:
-                provider = get_provider(settings.AI_FALLBACK_PROVIDER)
-                provider_name = settings.AI_FALLBACK_PROVIDER
-                output_bytes = await provider.edit(proc_bytes, prompt)
+                try:
+                    fallback_prov = get_provider(settings.AI_FALLBACK_PROVIDER)
+                    provider_name = settings.AI_FALLBACK_PROVIDER
+                    output_bytes = await call_provider(fallback_prov)
+                except Exception as e2:
+                    logger.warning(f"Secondary fallback failed: {e2}. Using Stylist provider.")
+                    fallback_prov = FallbackProvider()
+                    provider_name = "fallback"
+                    output_bytes = await call_provider(fallback_prov)
             else:
-                # Use FallbackProvider to guarantee graceful output
-                fallback = FallbackProvider()
+                fallback_prov = FallbackProvider()
                 provider_name = "fallback"
-                output_bytes = await fallback.edit(proc_bytes, prompt)
+                output_bytes = await call_provider(fallback_prov)
 
         if not output_bytes:
             raise RuntimeError("GENERATION_FAILED: No image output produced")

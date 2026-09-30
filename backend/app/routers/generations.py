@@ -35,7 +35,10 @@ def create_generation(
         )
 
     now = datetime.now(timezone.utc)
-    if photo.expires_at < now:
+    photo_expires = photo.expires_at
+    if photo_expires.tzinfo is None:
+        photo_expires = photo_expires.replace(tzinfo=timezone.utc)
+    if photo_expires < now:
         raise HTTPException(
             status_code=status.HTTP_410_GONE,
             detail={"error": {"code": "PHOTO_EXPIRED", "message": "This photo has expired. Please upload a fresh photo."}}

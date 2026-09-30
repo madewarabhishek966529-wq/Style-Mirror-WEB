@@ -75,7 +75,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+from app.limiter import limiter
+import uuid
+
 # Standardized Error Handling
+@app.exception_handler(RateLimitExceeded)
+async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+    return JSONResponse(
+        status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+        content={"error": {"code": "RATE_LIMITED", "message": "Hourly limit reached. Please wait a few minutes before trying again."}}
+    )
+
 @app.exception_handler(StarletteHTTPException)
 async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
     if isinstance(exc.detail, dict) and "error" in exc.detail:
@@ -93,6 +105,33 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content={"error": {"code": "VALIDATION_ERROR", "message": msg}}
     )
+
+# SlowAPI Limiter state and middleware
+app.state.limiter = limiter
+app.add_middleware(SlowAPIMiddleware)
+
+# Anonymous session cookie middleware
+@app.middleware("http")
+async def ensure_session_cookie(request: Request, call_next):
+    session_id = request.cookies.get("session_id")
+    is_new = False
+    if not session_id:
+        session_id = str(uuid.uuid4())
+        is_new = True
+        request.state.session_id = session_id
+    else:
+        request.state.session_id = session_id
+
+    response = await call_next(request)
+    if is_new:
+        response.set_cookie(
+            key="session_id",
+            value=session_id,
+            httponly=True,
+            samesite="lax",
+            max_age=86400 * 30
+        )
+    return response
 
 # Include Routers
 app.include_router(styles.router)

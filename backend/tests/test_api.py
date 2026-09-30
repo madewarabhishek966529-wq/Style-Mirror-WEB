@@ -117,4 +117,76 @@ def test_generation_with_valid_photo_succeeds(client):
     assert "job_id" in data
     assert data["status"] in ("queued", "running", "done")
 
+def test_session_cookie_middleware():
+    from fastapi.testclient import TestClient
+    with TestClient(app) as fresh_client:
+        res = fresh_client.get("/v1/styles")
+        assert res.status_code == 200
+        assert "session_id" in fresh_client.cookies
+
+def test_delete_photo_endpoint_and_storage(client, tmp_path):
+    from app.models import Photo
+    from app.db import SessionLocal
+    from app.services.storage import save_original_photo, get_full_path
+    from datetime import datetime, timezone, timedelta
+
+    pid = "test-delete-photo-id"
+    # Save dummy file
+    save_original_photo(pid, b"dummy photo content")
+    photo_file = get_full_path(f"photos/{pid}/original.jpg")
+    assert photo_file.exists()
+
+    db = SessionLocal()
+    photo = Photo(
+        id=pid,
+        session_id="test-session",
+        storage_path=f"photos/{pid}/original.jpg",
+        sha256="dummyhash",
+        face_meta={},
+        created_at=datetime.now(timezone.utc),
+        expires_at=datetime.now(timezone.utc) + timedelta(hours=24)
+    )
+    db.merge(photo)
+    db.commit()
+    db.close()
+
+    # Call DELETE /v1/photos/{photo_id}
+    res = client.delete(f"/v1/photos/{pid}")
+    assert res.status_code == 200
+    assert res.json()["ok"] is True
+
+    # Check file removed
+    assert not photo_file.exists()
+
+    # Check DB record removed
+    db = SessionLocal()
+    assert db.query(Photo).filter(Photo.id == pid).first() is None
+    db.close()
+
+def test_serve_file_endpoint(client):
+    from app.services.storage import save_original_photo, generate_signed_url
+    pid = "test-serve-file-id"
+    rel_path = save_original_photo(pid, b"some fake image bytes")
+    signed_url = generate_signed_url(rel_path, expires_in_seconds=300)
+
+    # Valid token request
+    res = client.get(signed_url)
+    assert res.status_code == 200
+    assert res.content == b"some fake image bytes"
+
+    # Invalid token request
+    bad_url = signed_url.split("&token=")[0] + "&token=badinvalidtoken"
+    res_bad = client.get(bad_url)
+    assert res_bad.status_code == 403
+    assert res_bad.json()["error"]["code"] == "TOKEN_INVALID"
+
+def test_daily_generation_cap(client, monkeypatch):
+    from app.config import settings
+    monkeypatch.setattr(settings, "DAILY_GENERATION_CAP", 0)
+
+    res = client.post("/v1/generations", json={"photo_id": "any-id", "hair_style_id": "H01"})
+    assert res.status_code == 429
+    assert res.json()["error"]["code"] == "DAILY_CAP_REACHED"
+
+
 

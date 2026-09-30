@@ -1,16 +1,20 @@
 from datetime import datetime, timezone
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, status
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, status, Request
 from sqlalchemy.orm import Session
 from app.db import get_db
 from app.models import Generation, Photo, Style
+from app.config import settings
 from app.schemas import GenerationCreateRequest, GenerationJobResponse
 from app.services.storage import generate_signed_url
 from app.workers.generate import process_generation_job
+from app.limiter import limiter
 
 router = APIRouter(prefix="/v1", tags=["generations"])
 
 @router.post("/generations", response_model=GenerationJobResponse)
+@limiter.limit(f"{settings.RATE_LIMIT_ANON_PER_HOUR * 3}/hour")
 def create_generation(
+    request: Request,
     req: GenerationCreateRequest,
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db)
@@ -24,6 +28,16 @@ def create_generation(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail={"error": {"code": "STYLE_REQUIRED", "message": "At least one hairstyle or beard style must be selected."}}
+        )
+
+    # Check daily generation cap per specification
+    now = datetime.now(timezone.utc)
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    today_count = db.query(Generation).filter(Generation.created_at >= today_start).count()
+    if today_count >= settings.DAILY_GENERATION_CAP:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail={"error": {"code": "DAILY_CAP_REACHED", "message": "Daily generation quota reached. Please try again tomorrow."}}
         )
 
     # Validate photo existence and expiry

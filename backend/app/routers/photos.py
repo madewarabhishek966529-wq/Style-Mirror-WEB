@@ -9,6 +9,7 @@ from app.config import settings
 from app.schemas import PhotoUploadResponse
 from app.services.storage import save_original_photo, delete_photo_storage
 from app.services.face_check import validate_photo_bytes
+from app.limiter import limiter
 
 router = APIRouter(prefix="/v1", tags=["photos"])
 
@@ -16,6 +17,7 @@ MAX_FILE_SIZE = 8 * 1024 * 1024  # 8 MB
 ALLOWED_MIME_TYPES = {"image/jpeg", "image/png", "image/webp", "image/jpg"}
 
 @router.post("/photos", response_model=PhotoUploadResponse)
+@limiter.limit(f"{settings.RATE_LIMIT_ANON_PER_HOUR}/hour")
 async def upload_photo(
     request: Request,
     file: UploadFile = File(...),

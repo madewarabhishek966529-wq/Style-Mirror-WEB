@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     AI_FALLBACK_PROVIDER: str = "fallback"
     REPLICATE_API_TOKEN: str = ""
     
-    DATABASE_URL: str = "sqlite:///./stylemirror.db"
+    DATABASE_URL: str = f"sqlite:///{BASE_DIR.as_posix()}/stylemirror.db"
     STORAGE_DIR: str = str(BASE_DIR / "storage")
     PHOTO_TTL_HOURS: int = 24
     

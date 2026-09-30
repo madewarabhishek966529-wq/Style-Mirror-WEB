@@ -18,6 +18,10 @@ from app.services.cleanup import cleanup_expired_photos_loop
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 FRONTEND_DIR = ROOT_DIR / "frontend"
 
+import sys
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # 1. Ensure DB tables exist
